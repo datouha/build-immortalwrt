@@ -11,9 +11,11 @@ on:
         
 env:
   REPO_URL: https://github.com/immortalwrt/immortalwrt
-  REPO_BRANCH: openwrt-21.02
+  REPO_BRANCH: openwrt-24.10
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: .config
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: diy-part2.sh
   TZ: Asia/Shanghai
   DEVICE: newifi3-d2
   UPLOAD_OUTPUT: true
@@ -65,8 +67,16 @@ jobs:
     - name: 修改 Lan IP
       run: |
         cd openwrt
-        sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
+        sed -i 's/192.168.1.1/192.168.6.1/g' package/base-files/files/bin/config_generate
         neofetch
+
+    - name: SSH connection to Actions
+      uses: P3TERX/ssh2actions@v1.0.0
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        
 
     - name: 下载依赖
       run: |
@@ -102,4 +112,4 @@ jobs:
         body: |
           # 未测试×
           
-          IP: 192.168.2.1 | Password: none
+          IP: 192.168.6.1 | Password: none
